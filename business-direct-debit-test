@@ -1,0 +1,2243 @@
+openapi: 3.0.1
+info:
+  title: API BS Direct Debit Testing V1
+  description: 'Permite registrar la operación inicial de carga de archivos, registrar, remover y listar los errores de los metadatos de los archivos. Además, registrar y listar el seguimiento de las solicitudes de Afiliación o Cobro a los usuarios de las empresas afiliadas al producto de Débito Automático.'
+  version: 1.0.0
+externalDocs:
+  description: Para más información de la API BS Direct Debit V1
+  url: 'https://swaggerhub.lima.bcp.com.pe/domains/BCP_Dev/readme-business-direct-debit-v1/1'
+servers:
+  - url: /trade-banking/direct-debit/v1
+tags:
+  - name: Batch Debit
+    description: Batch Debit Controller
+  - name: Payment Tracking
+    description: Payment Tracking Controller
+  - name: Debit Company
+    description: Debit Company Controller
+paths:
+  /batch-debits:
+    post:
+      tags:
+        - Batch Debit
+      summary: Registra una carga de archivos de afiliacion o cobro de débito automático.
+      description: |
+        ### Acerca de la funcionalidad expuesta
+        Registra una carga de archivos de afiliacion o cobro de débito automático.
+      operationId: createBatchDebit
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de Authorización
+          required: true
+          schema:
+            type: string
+            example: Bearer 363536363jjxnj63633611
+        - name: Request-ID
+          in: header
+          description: Este campo es un valor estandar ya existente y sera usado como identificador.
+          required: true
+          schema:
+            maxLength: 36
+            pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$'
+            type: string
+            example: 550e8400-e29b-41d4-a716-446655440000
+        - name: request-date
+          in: header
+          description: Fecha de la petición
+          required: true
+          schema:
+            maxLength: 29
+            pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{4}([a-z]|[A-Z]|\d)?$'
+            type: string
+            example: '2020-10-09T14:02:03.987-0700'
+        - name: app-code
+          in: header
+          description: 'Codigo de la aplicacion que invoca el servicio. Se debe usar el codigo de 2 caracteres que tienen asignada las aplicaciones, puede ser el canal.'
+          required: true
+          schema:
+            maxLength: 2
+            minLength: 2
+            pattern: '^[0-9A-Z]*$'
+            type: string
+            example: P0
+        - name: caller-name
+          in: header
+          description: Nombre de la API que realiza la invocacion al servicio.
+          required: true
+          schema:
+            maxLength: 100
+            minLength: 5
+            pattern: '^[0-9a-zA-Z.-]*$'
+            type: string
+            example: atlas-cross-services-loans-deposits-loan-loans-v2
+        - name: Ocp-Apim-Subscription-Key
+          in: header
+          description: 'Identificador de suscripción, este campo es obtenido al momento de la suscripción.'
+          required: true
+          schema:
+            maxLength: 32
+            minLength: 32
+            pattern: '^[a-z0-9]{32}$'
+            type: string
+            example: 3cfdad6e03c24d0ab7112dce75cdba35
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBatchDebitRequest'
+      responses:
+        '201':
+          description: El procesamiento de la petición ha sido exitosa.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateBatchDebitResponse'
+        '400':
+          description: Los datos proporcionados no son válidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '401':
+          description: No tiene el permiso de autenticación para realizar esta petición.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '404':
+          description: No se encontró el recurso solicitado en la URI.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '409':
+          description: La solicitud no cumple con alguna regla de negocio.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '429':
+          description: La solicitud alcanzó el límite máximo de peticiones permitidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '500':
+          description: Ocurrió un error inesperado. Por favor contactarse con Soporte Técnico.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '503':
+          description: El servicio no se encuentra disponible actualmente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+      x-atlas-header:
+        $ref: '#/components/schemas/BatchDebitHeaders'
+      x-stoplight:
+        id: c8ypk8237v5iq
+  '/batch-debits/{batchDebitId}/files':
+    get:
+      tags:
+        - Batch Debit
+      summary: Lista los archivos de una carga de afiliación o cobro de débito automático.
+      description: |
+        ### Acerca de la funcionalidad expuesta
+        Lista los archivos de una carga de afiliación o cobro de débito automático.
+      operationId: listFiles
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de Authorización
+          required: true
+          schema:
+            type: string
+            example: Bearer 363536363jjxnj63633611
+        - name: Request-ID
+          in: header
+          description: Este campo es un valor estandar ya existente y sera usado como identificador.
+          required: true
+          schema:
+            maxLength: 36
+            pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$'
+            type: string
+            example: 550e8400-e29b-41d4-a716-446655440000
+        - name: request-date
+          in: header
+          description: Fecha de la petición
+          required: true
+          schema:
+            maxLength: 29
+            pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{4}([a-z]|[A-Z]|\d)?$'
+            type: string
+            example: '2020-10-09T14:02:03.987-0700'
+        - name: app-code
+          in: header
+          description: 'Codigo de la aplicacion que invoca el servicio. Se debe usar el codigo de 2 caracteres que tienen asignada las aplicaciones, puede ser el canal.'
+          required: true
+          schema:
+            maxLength: 2
+            minLength: 2
+            pattern: '^[0-9A-Z]*$'
+            type: string
+            example: P0
+        - name: caller-name
+          in: header
+          description: Nombre de la API que realiza la invocacion al servicio.
+          required: true
+          schema:
+            maxLength: 100
+            minLength: 5
+            pattern: '^[0-9a-zA-Z.-]*$'
+            type: string
+            example: atlas-cross-services-loans-deposits-loan-loans-v2
+        - name: Ocp-Apim-Subscription-Key
+          in: header
+          description: 'Identificador de suscripción, este campo es obtenido al momento de la suscripción.'
+          required: true
+          schema:
+            maxLength: 32
+            minLength: 32
+            pattern: '^[a-z0-9]{32}$'
+            type: string
+            example: 3cfdad6e03c24d0ab7112dce75cdba35
+        - name: batchDebitId
+          in: path
+          description: Código de carga que agrupa los archivos del proceso de Afiliación o Cobro de débito automático.
+          required: true
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            example: 102030
+      responses:
+        '200':
+          description: Se obtuvo la lista de archivos en proceso de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListFilesResponse'
+        '204':
+          description: No se encontró resultados de la búsqueda.
+        '400':
+          description: Los datos proporcionados no son válidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '401':
+          description: No tiene el permiso de autenticación para realizar esta petición.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '404':
+          description: No se encontró el recurso solicitado en la URI.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '409':
+          description: La solicitud no cumple con alguna regla de negocio.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '429':
+          description: La solicitud alcanzó el límite máximo de peticiones permitidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '500':
+          description: Ocurrió un error inesperado. Por favor contactarse con Soporte Técnico.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '503':
+          description: El servicio no se encuentra disponible actualmente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+      x-atlas-header:
+        $ref: '#/components/schemas/BatchDebitHeaders'
+      x-atlas-query:
+        $ref: '#/components/schemas/BatchDebitQuery'
+      x-stoplight:
+        id: m0ielcy5rpvsl
+  '/batch-debits/{batchDebitId}/files/{fileId}':
+    get:
+      tags:
+        - Batch Debit
+      summary: Consulta la información de un archivo cargado de Débito Automático.
+      description: |
+        ### Acerca de la funcionalidad expuesta
+        Consulta la información de un archivo cargado de Débito Automático.
+      operationId: getFile
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de Authorización
+          required: true
+          schema:
+            type: string
+            example: Bearer 363536363jjxnj63633611
+        - name: Request-ID
+          in: header
+          description: Este campo es un valor estandar ya existente y sera usado como identificador.
+          required: true
+          schema:
+            maxLength: 36
+            pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$'
+            type: string
+            example: 550e8400-e29b-41d4-a716-446655440000
+        - name: request-date
+          in: header
+          description: Fecha de la petición
+          required: true
+          schema:
+            maxLength: 29
+            pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{4}([a-z]|[A-Z]|\d)?$'
+            type: string
+            example: '2020-10-09T14:02:03.987-0700'
+        - name: app-code
+          in: header
+          description: 'Codigo de la aplicacion que invoca el servicio. Se debe usar el codigo de 2 caracteres que tienen asignada las aplicaciones, puede ser el canal.'
+          required: true
+          schema:
+            maxLength: 2
+            minLength: 2
+            pattern: '^[0-9A-Z]*$'
+            type: string
+            example: P0
+        - name: caller-name
+          in: header
+          description: Nombre de la API que realiza la invocacion al servicio.
+          required: true
+          schema:
+            maxLength: 100
+            minLength: 5
+            pattern: '^[0-9a-zA-Z.-]*$'
+            type: string
+            example: atlas-cross-services-loans-deposits-loan-loans-v2
+        - name: Ocp-Apim-Subscription-Key
+          in: header
+          description: 'Identificador de suscripción, este campo es obtenido al momento de la suscripción.'
+          required: true
+          schema:
+            maxLength: 32
+            minLength: 32
+            pattern: '^[a-z0-9]{32}$'
+            type: string
+            example: 3cfdad6e03c24d0ab7112dce75cdba35
+        - name: batchDebitId
+          in: path
+          description: Código de carga que agrupa los archivos del proceso de Afiliación o Cobro de débito automático.
+          required: true
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            example: 102030
+        - name: fileId
+          in: path
+          description: Código del archivo de Débito Automático.
+          required: true
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            example: 250
+      responses:
+        '200':
+          description: Se obtuvo la información solicitada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetFileResponse'
+        '204':
+          description: No se encontró la información solicitada.
+        '400':
+          description: Los datos proporcionados no son válidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '401':
+          description: No tiene el permiso de autenticación para realizar esta petición.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '404':
+          description: No se encontró el recurso solicitado en la URI.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '409':
+          description: La solicitud no cumple con alguna regla de negocio.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '429':
+          description: La solicitud alcanzó el límite máximo de peticiones permitidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '500':
+          description: Ocurrió un error inesperado. Por favor contactarse con Soporte Técnico.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '503':
+          description: El servicio no se encuentra disponible actualmente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+      x-atlas-header:
+        $ref: '#/components/schemas/BatchDebitHeaders'
+      x-atlas-query:
+        $ref: '#/components/schemas/BatchDebitQuery'
+      x-stoplight:
+        id: s1534d1j6biw8
+  '/files/{fileId}/operational-errors':
+    get:
+      tags:
+        - Batch Debit
+      summary: Lista los errores que se validaron en el proceso de carga del archivo de Débito Automático.
+      description: |
+        ### Acerca de la funcionalidad expuesta
+        Lista los errores que se validaron en el proceso de carga del archivo de Débito Automático.
+      operationId: listOperationalErrors
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de Authorización
+          required: true
+          schema:
+            type: string
+            example: Bearer 363536363jjxnj63633611
+        - name: Request-ID
+          in: header
+          description: Este campo es un valor estandar ya existente y sera usado como identificador.
+          required: true
+          schema:
+            maxLength: 36
+            pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$'
+            type: string
+            example: 550e8400-e29b-41d4-a716-446655440000
+        - name: request-date
+          in: header
+          description: Fecha de la petición
+          required: true
+          schema:
+            maxLength: 29
+            pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{4}([a-z]|[A-Z]|\d)?$'
+            type: string
+            example: '2020-10-09T14:02:03.987-0700'
+        - name: app-code
+          in: header
+          description: 'Codigo de la aplicacion que invoca el servicio. Se debe usar el codigo de 2 caracteres que tienen asignada las aplicaciones, puede ser el canal.'
+          required: true
+          schema:
+            maxLength: 2
+            minLength: 2
+            pattern: '^[0-9A-Z]*$'
+            type: string
+            example: P0
+        - name: caller-name
+          in: header
+          description: Nombre de la API que realiza la invocacion al servicio.
+          required: true
+          schema:
+            maxLength: 100
+            minLength: 5
+            pattern: '^[0-9a-zA-Z.-]*$'
+            type: string
+            example: atlas-cross-services-loans-deposits-loan-loans-v2
+        - name: Ocp-Apim-Subscription-Key
+          in: header
+          description: 'Identificador de suscripción, este campo es obtenido al momento de la suscripción.'
+          required: true
+          schema:
+            maxLength: 32
+            minLength: 32
+            pattern: '^[a-z0-9]{32}$'
+            type: string
+            example: 3cfdad6e03c24d0ab7112dce75cdba35
+        - name: fileId
+          in: path
+          description: Código del archivo de Débito Automático.
+          required: true
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            example: 250
+        - name: limit
+          in: query
+          description: Indica la cantidad máxima de registros a traer. Ejm. 25.
+          required: true
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            example: 25
+        - name: offset
+          in: query
+          description: Indica la cantidad de registros que serán exonerados en la búsqueda. (Ejm. offset = 50 es decir obtener los registros desde 51 a 75)
+          required: true
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            example: 50
+      responses:
+        '200':
+          description: Se obtuvo la lista de errores asociadas al codigo de archivo cargado correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOperationalErrorsResponse'
+        '204':
+          description: No se encontró lista de errores asociadas al codigo de archivo cargado.
+        '400':
+          description: Los datos proporcionados no son válidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '401':
+          description: No tiene el permiso de autenticación para realizar esta petición.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '404':
+          description: No se encontró el recurso solicitado en la URI.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '409':
+          description: La solicitud no cumple con alguna regla de negocio.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '429':
+          description: La solicitud alcanzó el límite máximo de peticiones permitidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '500':
+          description: Ocurrió un error inesperado. Por favor contactarse con Soporte Técnico.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '503':
+          description: El servicio no se encuentra disponible actualmente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+      x-atlas-header:
+        $ref: '#/components/schemas/BatchDebitHeaders'
+      x-atlas-query:
+        $ref: '#/components/schemas/BatchDebitQuery'
+      x-stoplight:
+        id: pni3d1s1ydfl1
+  '/payments-tracking/{paymentTrackingId}':
+    get:
+      tags:
+        - Payment Tracking
+      summary: Consulta la información de un seguimiento de aprobación de Debito Automático.
+      description: |
+        ### Acerca de la funcionalidad expuesta
+        Consulta la información de un seguimiento de aprobación de Debito Automático. 
+      operationId: getPaymentTracking
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de Authorización
+          required: true
+          schema:
+            type: string
+            example: Bearer 363536363jjxnj63633611
+        - name: Request-ID
+          in: header
+          description: Este campo es un valor estandar ya existente y sera usado como identificador.
+          required: true
+          schema:
+            maxLength: 36
+            pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$'
+            type: string
+            example: 550e8400-e29b-41d4-a716-446655440000
+        - name: request-date
+          in: header
+          description: Fecha de la petición
+          required: true
+          schema:
+            maxLength: 29
+            pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{4}([a-z]|[A-Z]|\d)?$'
+            type: string
+            example: '2020-10-09T14:02:03.987-0700'
+        - name: app-code
+          in: header
+          description: 'Codigo de la aplicacion que invoca el servicio. Se debe usar el codigo de 2 caracteres que tienen asignada las aplicaciones, puede ser el canal.'
+          required: true
+          schema:
+            maxLength: 2
+            minLength: 2
+            pattern: '^[0-9A-Z]*$'
+            type: string
+            example: P0
+        - name: caller-name
+          in: header
+          description: Nombre de la API que realiza la invocacion al servicio.
+          required: true
+          schema:
+            maxLength: 100
+            minLength: 5
+            pattern: '^[0-9a-zA-Z.-]*$'
+            type: string
+            example: atlas-cross-services-loans-deposits-loan-loans-v2
+        - name: Ocp-Apim-Subscription-Key
+          in: header
+          description: 'Identificador de suscripción, este campo es obtenido al momento de la suscripción.'
+          required: true
+          schema:
+            maxLength: 32
+            minLength: 32
+            pattern: '^[a-z0-9]{32}$'
+            type: string
+            example: 3cfdad6e03c24d0ab7112dce75cdba35
+        - name: paymentTrackingId
+          in: path
+          description: Código de seguimiento de la solicitud.
+          required: true
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            example: 7250
+      responses:
+        '200':
+          description: Se obtuvo la información correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPaymentTrackingResponse'
+        '204':
+          description: No se encontró la información solicitada.
+        '400':
+          description: Los datos proporcionados no son válidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '401':
+          description: No tiene el permiso de autenticación para realizar esta petición.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '404':
+          description: No se encontró el recurso solicitado en la URI.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '409':
+          description: La solicitud no cumple con alguna regla de negocio.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '429':
+          description: La solicitud alcanzó el límite máximo de peticiones permitidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '500':
+          description: Ocurrió un error inesperado. Por favor contactarse con Soporte Técnico.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '503':
+          description: El servicio no se encuentra disponible actualmente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+      x-atlas-header:
+        $ref: '#/components/schemas/PaymentTrackingHeaders'
+      x-atlas-query:
+        $ref: '#/components/schemas/PaymentTrackingQuery'
+      x-stoplight:
+        id: 15mzovipuk49w
+    post:
+      tags:
+        - Payment Tracking
+      summary: Registra el seguimiento de aprobación del proceso de Débito Automático.
+      description: |
+        ### Acerca de la funcionalidad expuesta
+        Registra el seguimiento de aprobación del proceso de Débito Automático.     
+      operationId: createPaymentTracking
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de Authorización
+          required: true
+          schema:
+            type: string
+            example: Bearer 363536363jjxnj63633611
+        - name: Request-ID
+          in: header
+          description: Este campo es un valor estandar ya existente y sera usado como identificador.
+          required: true
+          schema:
+            maxLength: 36
+            pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$'
+            type: string
+            example: 550e8400-e29b-41d4-a716-446655440000
+        - name: request-date
+          in: header
+          description: Fecha de la petición
+          required: true
+          schema:
+            maxLength: 29
+            pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{4}([a-z]|[A-Z]|\d)?$'
+            type: string
+            example: '2020-10-09T14:02:03.987-0700'
+        - name: app-code
+          in: header
+          description: 'Codigo de la aplicacion que invoca el servicio. Se debe usar el codigo de 2 caracteres que tienen asignada las aplicaciones, puede ser el canal.'
+          required: true
+          schema:
+            maxLength: 2
+            minLength: 2
+            pattern: '^[0-9A-Z]*$'
+            type: string
+            example: P0
+        - name: caller-name
+          in: header
+          description: Nombre de la API que realiza la invocacion al servicio.
+          required: true
+          schema:
+            maxLength: 100
+            minLength: 5
+            pattern: '^[0-9a-zA-Z.-]*$'
+            type: string
+            example: atlas-cross-services-loans-deposits-loan-loans-v2
+        - name: Ocp-Apim-Subscription-Key
+          in: header
+          description: 'Identificador de suscripción, este campo es obtenido al momento de la suscripción.'
+          required: true
+          schema:
+            maxLength: 32
+            minLength: 32
+            pattern: '^[a-z0-9]{32}$'
+            type: string
+            example: 3cfdad6e03c24d0ab7112dce75cdba35
+        - name: paymentTrackingId
+          in: path
+          description: Código de seguimiento de la solicitud.
+          required: true
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            example: 7250
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentTrackingRequest'
+      responses:
+        '204':
+          description: El registro la solicitud se realizo con exito.
+        '400':
+          description: Los datos proporcionados no son válidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '401':
+          description: No tiene el permiso de autenticación para realizar esta petición.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '404':
+          description: No se encontró el recurso solicitado en la URI.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '409':
+          description: La solicitud no cumple con alguna regla de negocio.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '429':
+          description: La solicitud alcanzó el límite máximo de peticiones permitidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '500':
+          description: Ocurrió un error inesperado. Por favor contactarse con Soporte Técnico.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '503':
+          description: El servicio no se encuentra disponible actualmente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+      x-atlas-header:
+        $ref: '#/components/schemas/PaymentTrackingHeaders'
+      x-stoplight:
+        id: 8t5fcipaagl5t
+    patch:
+      tags:
+        - Payment Tracking
+      summary: Actualiza el seguimiento de aprobación de una solicitud de Debito Automatico.
+      description: |
+        ### Acerca de la funcionalidad expuesta
+        Actualiza el seguimiento de aprobación de una solicitud de Debito Automatico.
+      operationId: updatePaymentTracking
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de Authorización
+          required: true
+          schema:
+            type: string
+            example: Bearer 363536363jjxnj63633611
+        - name: Request-ID
+          in: header
+          description: Este campo es un valor estandar ya existente y sera usado como identificador.
+          required: true
+          schema:
+            maxLength: 36
+            pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$'
+            type: string
+            example: 550e8400-e29b-41d4-a716-446655440000
+        - name: request-date
+          in: header
+          description: Fecha de la petición
+          required: true
+          schema:
+            maxLength: 29
+            pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{4}([a-z]|[A-Z]|\d)?$'
+            type: string
+            example: '2020-10-09T14:02:03.987-0700'
+        - name: app-code
+          in: header
+          description: 'Codigo de la aplicacion que invoca el servicio. Se debe usar el codigo de 2 caracteres que tienen asignada las aplicaciones, puede ser el canal.'
+          required: true
+          schema:
+            maxLength: 2
+            minLength: 2
+            pattern: '^[0-9A-Z]*$'
+            type: string
+            example: P0
+        - name: caller-name
+          in: header
+          description: Nombre de la API que realiza la invocacion al servicio.
+          required: true
+          schema:
+            maxLength: 100
+            minLength: 5
+            pattern: '^[0-9a-zA-Z.-]*$'
+            type: string
+            example: atlas-cross-services-loans-deposits-loan-loans-v2
+        - name: Ocp-Apim-Subscription-Key
+          in: header
+          description: 'Identificador de suscripción, este campo es obtenido al momento de la suscripción.'
+          required: true
+          schema:
+            maxLength: 32
+            minLength: 32
+            pattern: '^[a-z0-9]{32}$'
+            type: string
+            example: 3cfdad6e03c24d0ab7112dce75cdba35
+        - name: paymentTrackingId
+          in: path
+          description: Código de seguimiento de la solicitud.
+          required: true
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            example: 7250
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePaymentTrackingRequest'
+      responses:
+        '204':
+          description: El procesamiento de la petición ha sido exitosa.
+        '400':
+          description: Los datos proporcionados no son válidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '401':
+          description: No tiene el permiso de autenticación para realizar esta petición.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '404':
+          description: No se encontró el recurso solicitado en la URI.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '409':
+          description: La solicitud no cumple con alguna regla de negocio.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '429':
+          description: La solicitud alcanzó el límite máximo de peticiones permitidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '500':
+          description: Ocurrió un error inesperado. Por favor contactarse con Soporte Técnico.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '503':
+          description: El servicio no se encuentra disponible actualmente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+      x-atlas-header:
+        $ref: '#/components/schemas/PaymentTrackingHeaders'
+      x-stoplight:
+        id: mm971uy0hv1be
+  /payments-tracking/search:
+    post:
+      tags:
+        - Payment Tracking
+      summary: Lista los seguimientos de aprobación de Debito Automático.
+      description: |
+        ### Acerca de la funcionalidad expuesta
+        Lista los seguimientos de aprobación de Debito Automático.
+      operationId: searchPaymentsTracking
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de Authorización
+          required: true
+          schema:
+            type: string
+            example: Bearer 363536363jjxnj63633611
+        - name: Request-ID
+          in: header
+          description: Este campo es un valor estandar ya existente y sera usado como identificador.
+          required: true
+          schema:
+            maxLength: 36
+            pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$'
+            type: string
+            example: 550e8400-e29b-41d4-a716-446655440000
+        - name: request-date
+          in: header
+          description: Fecha de la petición
+          required: true
+          schema:
+            maxLength: 29
+            pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{4}([a-z]|[A-Z]|\d)?$'
+            type: string
+            example: '2020-10-09T14:02:03.987-0700'
+        - name: app-code
+          in: header
+          description: 'Codigo de la aplicacion que invoca el servicio. Se debe usar el codigo de 2 caracteres que tienen asignada las aplicaciones, puede ser el canal.'
+          required: true
+          schema:
+            maxLength: 2
+            minLength: 2
+            pattern: '^[0-9A-Z]*$'
+            type: string
+            example: P0
+        - name: caller-name
+          in: header
+          description: Nombre de la API que realiza la invocacion al servicio.
+          required: true
+          schema:
+            maxLength: 100
+            minLength: 5
+            pattern: '^[0-9a-zA-Z.-]*$'
+            type: string
+            example: atlas-cross-services-loans-deposits-loan-loans-v2
+        - name: Ocp-Apim-Subscription-Key
+          in: header
+          description: 'Identificador de suscripción, este campo es obtenido al momento de la suscripción.'
+          required: true
+          schema:
+            maxLength: 32
+            minLength: 32
+            pattern: '^[a-z0-9]{32}$'
+            type: string
+            example: 3cfdad6e03c24d0ab7112dce75cdba35
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchPaymentsTrackingRequest'
+      responses:
+        '200':
+          description: Se obtuvo la lista de seguimientos correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchPaymentsTrackingResponse'
+        '204':
+          description: No se encontró seguimientos.
+        '400':
+          description: Los datos proporcionados no son válidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '401':
+          description: No tiene el permiso de autenticación para realizar esta petición.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '404':
+          description: No se encontró el recurso solicitado en la URI.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '409':
+          description: La solicitud no cumple con alguna regla de negocio.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '429':
+          description: La solicitud alcanzó el límite máximo de peticiones permitidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '500':
+          description: Ocurrió un error inesperado. Por favor contactarse con Soporte Técnico.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '503':
+          description: El servicio no se encuentra disponible actualmente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+      x-atlas-header:
+        $ref: '#/components/schemas/PaymentTrackingHeaders'
+      x-stoplight:
+        id: 0usshe4bvsxlo
+  '/companies/{companyId}':
+    get:
+      tags:
+        - Debit Company
+      summary: Consulta la información de una empresa de Débito Automático.
+      description: |
+        ### Acerca de la funcionalidad expuesta
+        Consulta la información de una empresa de Débito Automático.
+      operationId: getCompany
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de Authorización
+          required: true
+          schema:
+            type: string
+            example: Bearer 363536363jjxnj63633611
+        - name: Request-ID
+          in: header
+          description: Este campo es un valor estandar ya existente y sera usado como identificador.
+          required: true
+          schema:
+            maxLength: 36
+            pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$'
+            type: string
+            example: 550e8400-e29b-41d4-a716-446655440000
+        - name: request-date
+          in: header
+          description: Fecha de la petición
+          required: true
+          schema:
+            maxLength: 29
+            pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{4}([a-z]|[A-Z]|\d)?$'
+            type: string
+            example: '2020-10-09T14:02:03.987-0700'
+        - name: app-code
+          in: header
+          description: 'Codigo de la aplicacion que invoca el servicio. Se debe usar el codigo de 2 caracteres que tienen asignada las aplicaciones, puede ser el canal.'
+          required: true
+          schema:
+            maxLength: 2
+            minLength: 2
+            pattern: '^[0-9A-Z]*$'
+            type: string
+            example: P0
+        - name: caller-name
+          in: header
+          description: Nombre de la API que realiza la invocacion al servicio.
+          required: true
+          schema:
+            maxLength: 100
+            minLength: 5
+            pattern: '^[0-9a-zA-Z.-]*$'
+            type: string
+            example: atlas-cross-services-loans-deposits-loan-loans-v2
+        - name: Ocp-Apim-Subscription-Key
+          in: header
+          description: 'Identificador de suscripción, este campo es obtenido al momento de la suscripción.'
+          required: true
+          schema:
+            maxLength: 32
+            minLength: 32
+            pattern: '^[a-z0-9]{32}$'
+            type: string
+            example: 3cfdad6e03c24d0ab7112dce75cdba35
+        - name: companyId
+          in: path
+          description: Código cic de la empresa
+          required: true
+          schema:
+            maxLength: 15
+            minLength: 1
+            pattern: '^[A-Z0-9]*$'
+            type: string
+            example: '72505023'
+      responses:
+        '200':
+          description: Se obtuvo la información solicitada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetCompanyResponse'
+        '204':
+          description: No se encontró la información solicitada.
+        '400':
+          description: Los datos proporcionados no son válidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '401':
+          description: No tiene el permiso de autenticación para realizar esta petición.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '404':
+          description: No se encontró el recurso solicitado en la URI.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '409':
+          description: La solicitud no cumple con alguna regla de negocio.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '429':
+          description: La solicitud alcanzó el límite máximo de peticiones permitidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '500':
+          description: Ocurrió un error inesperado. Por favor contactarse con Soporte Técnico.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '503':
+          description: El servicio no se encuentra disponible actualmente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+      x-atlas-header:
+        $ref: '#/components/schemas/DebitCompanyHeaders'
+      x-stoplight:
+        id: 8gyqt1ap9ip5c
+  '/companies/{companyId}/accounts':
+    get:
+      tags:
+        - Debit Company
+      summary: Lista las cuentas de una empresa de Débito Automático.
+      description: |
+        ### Acerca de la funcionalidad expuesta
+        Lista las cuentas de una empresa de Débito Automático.
+      operationId: listAccounts
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de Authorización
+          required: true
+          schema:
+            type: string
+            example: Bearer 363536363jjxnj63633611
+        - name: Request-ID
+          in: header
+          description: Este campo es un valor estandar ya existente y sera usado como identificador.
+          required: true
+          schema:
+            maxLength: 36
+            pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$'
+            type: string
+            example: 550e8400-e29b-41d4-a716-446655440000
+        - name: request-date
+          in: header
+          description: Fecha de la petición
+          required: true
+          schema:
+            maxLength: 29
+            pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{4}([a-z]|[A-Z]|\d)?$'
+            type: string
+            example: '2020-10-09T14:02:03.987-0700'
+        - name: app-code
+          in: header
+          description: 'Codigo de la aplicacion que invoca el servicio. Se debe usar el codigo de 2 caracteres que tienen asignada las aplicaciones, puede ser el canal.'
+          required: true
+          schema:
+            maxLength: 2
+            minLength: 2
+            pattern: '^[0-9A-Z]*$'
+            type: string
+            example: P0
+        - name: caller-name
+          in: header
+          description: Nombre de la API que realiza la invocacion al servicio.
+          required: true
+          schema:
+            maxLength: 100
+            minLength: 5
+            pattern: '^[0-9a-zA-Z.-]*$'
+            type: string
+            example: atlas-cross-services-loans-deposits-loan-loans-v2
+        - name: Ocp-Apim-Subscription-Key
+          in: header
+          description: 'Identificador de suscripción, este campo es obtenido al momento de la suscripción.'
+          required: true
+          schema:
+            maxLength: 32
+            minLength: 32
+            pattern: '^[a-z0-9]{32}$'
+            type: string
+            example: 3cfdad6e03c24d0ab7112dce75cdba35
+        - name: companyId
+          in: path
+          description: Código cic de la empresa
+          required: true
+          schema:
+            maxLength: 15
+            minLength: 1
+            pattern: '^[A-Z0-9]*$'
+            type: string
+            example: '72505023'
+      responses:
+        '200':
+          description: Se obtuvo la información solicitada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAccountsResponse'
+        '204':
+          description: No se encontró la información solicitada.
+        '400':
+          description: Los datos proporcionados no son válidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '401':
+          description: No tiene el permiso de autenticación para realizar esta petición.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '404':
+          description: No se encontró el recurso solicitado en la URI.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '409':
+          description: La solicitud no cumple con alguna regla de negocio.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '429':
+          description: La solicitud alcanzó el límite máximo de peticiones permitidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '500':
+          description: Ocurrió un error inesperado. Por favor contactarse con Soporte Técnico.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '503':
+          description: El servicio no se encuentra disponible actualmente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+      x-atlas-header:
+        $ref: '#/components/schemas/DebitCompanyHeaders'
+      x-stoplight:
+        id: auud45uw4sec5
+  '/companies/{companyId}/accounts/{accountId}':
+    get:
+      tags:
+        - Debit Company
+      summary: Consulta la información de una cuenta de Débito Automático de una compañía.
+      description: |
+        ### Acerca de la funcionalidad expuesta
+        Consulta la información de una cuenta de Débito Automático de una compañía.
+      operationId: getAccount
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de Authorización
+          required: true
+          schema:
+            type: string
+            example: Bearer 363536363jjxnj63633611
+        - name: Request-ID
+          in: header
+          description: Este campo es un valor estandar ya existente y sera usado como identificador.
+          required: true
+          schema:
+            maxLength: 36
+            pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$'
+            type: string
+            example: 550e8400-e29b-41d4-a716-446655440000
+        - name: request-date
+          in: header
+          description: Fecha de la petición
+          required: true
+          schema:
+            maxLength: 29
+            pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{4}([a-z]|[A-Z]|\d)?$'
+            type: string
+            example: '2020-10-09T14:02:03.987-0700'
+        - name: app-code
+          in: header
+          description: 'Codigo de la aplicacion que invoca el servicio. Se debe usar el codigo de 2 caracteres que tienen asignada las aplicaciones, puede ser el canal.'
+          required: true
+          schema:
+            maxLength: 2
+            minLength: 2
+            pattern: '^[0-9A-Z]*$'
+            type: string
+            example: P0
+        - name: caller-name
+          in: header
+          description: Nombre de la API que realiza la invocacion al servicio.
+          required: true
+          schema:
+            maxLength: 100
+            minLength: 5
+            pattern: '^[0-9a-zA-Z.-]*$'
+            type: string
+            example: atlas-cross-services-loans-deposits-loan-loans-v2
+        - name: Ocp-Apim-Subscription-Key
+          in: header
+          description: 'Identificador de suscripción, este campo es obtenido al momento de la suscripción.'
+          required: true
+          schema:
+            maxLength: 32
+            minLength: 32
+            pattern: '^[a-z0-9]{32}$'
+            type: string
+            example: 3cfdad6e03c24d0ab7112dce75cdba35
+        - name: companyId
+          in: path
+          description: Código cic de la empresa
+          required: true
+          schema:
+            maxLength: 15
+            minLength: 1
+            pattern: '^[A-Z0-9]*$'
+            type: string
+            example: '72505023'
+        - name: accountId
+          in: path
+          description: Código de la cuenta de Débito Automático.
+          required: true
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            example: 250
+      responses:
+        '200':
+          description: Se obtuvo la información solicitada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAccountResponse'
+        '204':
+          description: No se encontró la información solicitada.
+        '400':
+          description: Los datos proporcionados no son válidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '401':
+          description: No tiene el permiso de autenticación para realizar esta petición.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '404':
+          description: No se encontró el recurso solicitado en la URI.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '409':
+          description: La solicitud no cumple con alguna regla de negocio.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '429':
+          description: La solicitud alcanzó el límite máximo de peticiones permitidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '500':
+          description: Ocurrió un error inesperado. Por favor contactarse con Soporte Técnico.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '503':
+          description: El servicio no se encuentra disponible actualmente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+      x-atlas-header:
+        $ref: '#/components/schemas/DebitCompanyHeaders'
+      x-stoplight:
+        id: jnkzptrmpbu39
+components:
+  schemas:
+    BatchDebitHeaders:
+      title: BatchDebitHeaders
+      type: object
+      x-stoplight:
+        id: eb037f6oc68f4
+    PaymentTrackingHeaders:
+      title: PaymentTrackingHeaders
+      type: object
+      x-stoplight:
+        id: 6ny9jxsmx356d
+    DebitCompanyHeaders:
+      title: DebitCompanyHeaders
+      type: object
+      x-stoplight:
+        id: 0tvo8kzikp1so
+    BatchDebitQuery:
+      title: BatchDebitQuery
+      type: object
+      x-stoplight:
+        id: o507pr5tcwg8d
+    PaymentTrackingQuery:
+      title: PaymentTrackingQuery
+      type: object
+      x-stoplight:
+        id: vmnjoghxqt7vt
+    CreateBatchDebitRequest:
+      title: CreateBatchDebitRequest
+      required:
+        - batchDebit
+      type: object
+      properties:
+        batchDebit:
+          $ref: '#/components/schemas/BatchDebit'
+      x-stoplight:
+        id: vfchkf1z2mv3x
+    BatchDebit:
+      required:
+        - batchDebitTypeCode
+        - company
+        - debtorAgent
+        - files
+      type: object
+      properties:
+        batchDebitTypeCode:
+          $ref: '#/components/schemas/BatchDebitTypeCode'
+        company:
+          $ref: '#/components/schemas/CompanyId'
+        debtorAgent:
+          $ref: '#/components/schemas/DebtorAgent'
+        files:
+          maxItems: 5
+          type: array
+          items:
+            $ref: '#/components/schemas/DebitFile'
+      description: Información de la carga de archivos de débito automático.
+      x-stoplight:
+        id: szly99151oxfr
+    BatchDebitTypeCode:
+      title: batchDebitTypeCode
+      maxLength: 3
+      minLength: 3
+      pattern: ^(AFI|COB)$
+      type: string
+      description: Código del tipo de proceso de Débito Automático.
+      example: AFI
+      x-stoplight:
+        id: 8mbvgrfbkfc37
+    CompanyId:
+      title: CompanyId
+      required:
+        - companyId
+      type: object
+      properties:
+        companyId:
+          maxLength: 15
+          minLength: 1
+          pattern: '^[A-Z0-9]*$'
+          type: string
+          description: Código cic de la Compañia afiliado al producto de Débito Automático.
+          example: '200'
+      x-stoplight:
+        id: d32xzz1vxzde1
+    DebtorAgent:
+      title: DebtorAgent
+      required:
+        - documentNumber
+        - documentType
+      type: object
+      properties:
+        documentType:
+          maxLength: 2
+          minLength: 1
+          pattern: '^[0-9]*$'
+          type: string
+          description: Código del tipo de documento del usuario que realizó la operación.
+          example: '4'
+        documentNumber:
+          maxLength: 20
+          minLength: 1
+          pattern: '^[a-zA-Z0-9]*$'
+          type: string
+          description: Número de documento del usuario que realizó la operación.
+          example: L68686868
+      x-stoplight:
+        id: 0slg12a3wxg5n
+    DebitFile:
+      title: DebitFile
+      required:
+        - fileName
+        - fileSize
+      type: object
+      properties:
+        fileName:
+          $ref: '#/components/schemas/FileName'
+        fileSize:
+          maximum: 2147483647
+          minimum: 1
+          type: integer
+          description: Peso del archivo representado en Bytes.
+          example: 120000
+      x-stoplight:
+        id: wfyotay3ga12o
+    FileName:
+      maxLength: 50
+      minLength: 5
+      pattern: '^[\w\-\_]+\.(txt)$'
+      type: string
+      description: Nombre del archivo.
+      example: AfiliacionSoles0808.txt
+      x-stoplight:
+        id: wbnq2m551hrow
+    CreateBatchDebitResponse:
+      title: CreateBatchDebitResponse
+      type: object
+      properties:
+        batchDebit:
+          $ref: '#/components/schemas/BatchDebitResponse'
+      x-stoplight:
+        id: o2p3vdxhc92y4
+    BatchDebitResponse:
+      title: batchDebit
+      type: object
+      properties:
+        batchDebitId:
+          type: integer
+          description: Código de carga que agrupa los archivos del proceso de Afiliación o Cobro de débito automático.
+          example: 100
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/DebitFileAuthorization'
+      description: Información de la carga de archivos de débito automático.
+      x-stoplight:
+        id: abkl7sykjoiil
+    DebitFileAuthorization:
+      allOf:
+        - $ref: '#/components/schemas/DebitFile'
+        - type: object
+          properties:
+            fileUploadAuthorization:
+              $ref: '#/components/schemas/FileUploadAuthorization'
+      x-stoplight:
+        id: kglrubjqrzg2a
+    FileUploadAuthorization:
+      title: FileUploadAuthorization
+      required:
+        - fileAccessUri
+        - fileName
+      type: object
+      properties:
+        storageAccountFileName:
+          $ref: '#/components/schemas/StorageAccountFileName'
+        fileAccessUri:
+          type: string
+          description: URI SAS para acceso de subida de archivo.
+          example: 'https://dev.debito.com.pe/debit-file-management-upload/33350/9fecd7a6-9d89-4d4d-a039-c28f7181fec0.xml?sv=2019-12-12&ss=bfqt&srt=sco&sp=rwdlacupx&se=2020-12-29T12:00:27Z&st=2020-12-24T04:00:27Z&spr=https&sig=saxvw8iW9IdFTFbX%2BTwqHpkcf'
+      description: Información de autorización SAS de subida de archivo al Storage Account.
+      x-stoplight:
+        id: p25ki8hq4mue5
+    StorageAccountFileName:
+      type: string
+      description: Nombre completo del archivo generado en el Storage Account.
+      example: 9fecd7a6-9d89-4d4d-a039-c28f7181fec0.txt
+      x-stoplight:
+        id: 5uujdsbddhze1
+    ApiException:
+      title: ApiException
+      type: object
+      properties:
+        code:
+          type: string
+          description: Codigo de error de Sistema
+          example: TL0001
+        description:
+          type: string
+          description: Descripcion del error de Sistema
+          example: Error al llamar al servicio
+        errorType:
+          type: string
+          description: Tipo de Error de Sistema
+          example: TECHNICAL
+        exceptionDetails:
+          type: array
+          description: Lista de detalles del error
+          items:
+            $ref: '#/components/schemas/ApiExceptionDetail'
+        properties:
+          type: object
+          properties: {}
+          description: Lista de propiedades especiales.
+      description: Datos del error de sistema.
+      x-stoplight:
+        id: e4e5n6z359v0x
+    ApiExceptionDetail:
+      title: ApiExceptionDetail
+      type: object
+      properties:
+        code:
+          type: string
+          description: Codigo de error del Detalle/Proveedor
+          example: MB0008
+        component:
+          type: string
+          description: Nombre del componente de falla
+          example: MB.CardInqV2
+        description:
+          type: string
+          description: Descripcion del Detalle
+          example: Codigo invalido para el canal
+      description: Datos del error técnico.
+      x-stoplight:
+        id: ganrh4p4q3jjv
+    ListFilesResponse:
+      title: ListFilesResponse
+      type: object
+      properties:
+        debitFiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/DebitFileInformation'
+      x-stoplight:
+        id: 18dltdbvi25n8
+    DebitFileInformation:
+      allOf:
+        - $ref: '#/components/schemas/DebitFile'
+        - type: object
+          properties:
+            fileId:
+              $ref: '#/components/schemas/DebitFileId'
+            fileStatusCode:
+              maxLength: 30
+              minLength: 1
+              pattern: '^[A-Z0-9\-\_]*$'
+              type: string
+              description: Código del estado de la carga por archivo. Ejm. EST001 (APROBADO)
+              example: EST001
+            storageAccountFileName:
+              $ref: '#/components/schemas/StorageAccountFileName'
+            account:
+              $ref: '#/components/schemas/AccountId'
+            processingResult:
+              $ref: '#/components/schemas/ProcessingResult'
+            fileAmount:
+              $ref: '#/components/schemas/FileAmount'
+      x-stoplight:
+        id: 4cd18jjn8z6kw
+    DebitFileId:
+      maximum: 2147483647
+      minimum: 1
+      type: integer
+      description: Código del archivo cargado.
+      example: 25
+      x-stoplight:
+        id: 0mr7b18kd4xkb
+    AccountId:
+      title: AccountId
+      required:
+        - accountId
+      type: object
+      properties:
+        accountId:
+          maximum: 2147483647
+          minimum: 1
+          type: integer
+          description: Código de la cuenta de Debito Automático.
+          example: 100
+      x-stoplight:
+        id: j9u3jr2zgspzt
+    ProcessingResult:
+      title: ProcessingResult
+      type: object
+      properties:
+        totalRecords:
+          type: integer
+          description: Total de registros encontrados en el archivo cargado.
+          example: 145
+        correctRecords:
+          type: integer
+          description: Cantidad de registros correctos en el archivo cargado.
+          example: 145
+        errorsQuantity:
+          type: integer
+          description: Cantidad de errores encontrados en el archivo cargado.
+          example: 145
+      x-stoplight:
+        id: c8syzlxx5o0k3
+    FileAmount:
+      title: FileAmount
+      type: object
+      properties:
+        totalAmount:
+          type: number
+          description: Monto total referente al archivo cargado.
+          format: double
+          example: 10000.55
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+      x-stoplight:
+        id: a7ywta2rzfec2
+    CurrencyCode:
+      title: CurrencyCode
+      type: string
+      description: Código de la moneda.
+      example: PEN
+      x-stoplight:
+        id: tgtetixhthdl9
+    GetFileResponse:
+      title: GetFileResponse
+      type: object
+      properties:
+        debitFile:
+          $ref: '#/components/schemas/DebitFileInformation'
+      x-stoplight:
+        id: du2udo9wt47sn
+    ListOperationalErrorsResponse:
+      title: ListOperationalErrorsResponse
+      type: object
+      properties:
+        operationalErrors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OperationalError'
+        metadata:
+          $ref: '#/components/schemas/MetadataResponse'
+      x-stoplight:
+        id: wyq30zrikgugi
+    OperationalError:
+      title: OperationalError
+      type: object
+      properties:
+        errorRowNumber:
+          type: integer
+          description: Número de registro que tiene el error.
+          example: 1
+        consumerCode:
+          type: string
+          description: Código con el que la empresa afiliada reconoce a su usuario.
+          example: US001
+        errorMessage:
+          type: string
+          description: mensaje de error del registro
+          example: La cuenta de abono no es válida.
+      x-stoplight:
+        id: 0ulieqdt6f1kq
+    MetadataResponse:
+      type: object
+      properties:
+        totalRecords:
+          maximum: 2147483647
+          minimum: 1
+          type: integer
+          description: Indica el total de registros.
+          example: 225
+        offset:
+          maximum: 2147483647
+          minimum: 1
+          type: integer
+          description: Indica la cantidad de registros que fueron exonerados en la búsqueda. (Ej. offset = 50 es decir obtener los registros desde 51 a 75).
+          example: 50
+        limit:
+          maximum: 2147483647
+          minimum: 1
+          type: integer
+          description: Indica la cantidad máxima de registros devueltos.
+          example: 25
+      x-stoplight:
+        id: oaa2ruq0vnv0n
+    GetPaymentTrackingResponse:
+      title: GetPaymentTrackingResponse
+      type: object
+      properties:
+        paymentTracking:
+          $ref: '#/components/schemas/PaymentTracking'
+        batchDebit:
+          $ref: '#/components/schemas/BatchDebitCompany'
+      x-stoplight:
+        id: dwcpbqezvuvjj
+    PaymentTracking:
+      title: PaymentTracking
+      type: object
+      properties:
+        paymentTrackingId:
+          $ref: '#/components/schemas/PaymentTrackingId'
+        applicationCode:
+          $ref: '#/components/schemas/ApplicationCode'
+        trackingStatusCode:
+          $ref: '#/components/schemas/TrackingStatusCode'
+        debitFileInformation:
+          $ref: '#/components/schemas/DebitFileInformation'
+        trackingRegistrationDate:
+          type: string
+          description: Fecha de registro del seguimiento.
+          format: date-time
+          example: '2017-07-21T17:32:28Z'
+        trackingSteps:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrackingStep'
+      x-stoplight:
+        id: ap2a2gkypbcos
+    PaymentTrackingId:
+      maximum: 2147483647
+      minimum: 1
+      type: integer
+      description: Código del seguimiento.
+      example: 7025
+      x-stoplight:
+        id: rkru6u37m1rlp
+    ApplicationCode:
+      maxLength: 20
+      minLength: 1
+      pattern: '^[A-Z\-\_]*$'
+      type: string
+      description: Código de aplicación en donde se está realizando la solicitud.
+      example: NTLC
+      x-stoplight:
+        id: nueb4n2d19tj1
+    TrackingStatusCode:
+      maxLength: 30
+      minLength: 1
+      pattern: '^[A-Z0-9\-\_]*$'
+      type: string
+      description: Código del estado del seguimiento. Ejm. EST001 (APROBADO).
+      example: EST001
+      x-stoplight:
+        id: kxbggktu0ldbu
+    TrackingStep:
+      title: TrackingStep
+      required:
+        - debtorAgent
+        - stepStatus
+      type: object
+      properties:
+        stepStatusCode:
+          $ref: '#/components/schemas/StatusCode'
+        stepRegistrationDate:
+          type: string
+          description: Fecha del registro de aprobación del seguimiento.
+          format: date-time
+          example: '2017-07-21T17:32:28Z'
+        debtorAgent:
+          $ref: '#/components/schemas/DebtorAgent'
+      x-stoplight:
+        id: ec9uvn2dmwq6f
+    StatusCode:
+      maxLength: 30
+      minLength: 1
+      pattern: '^[A-Z0-9\-\_]*$'
+      type: string
+      description: Código del estado de la operación. Ejm. EST001 (APROBADO).
+      example: EST001
+      x-stoplight:
+        id: 9yignwwqxclbe
+    BatchDebitCompany:
+      type: object
+      properties:
+        batchDebitId:
+          $ref: '#/components/schemas/BatchDebitId'
+        batchDebitTypeCode:
+          $ref: '#/components/schemas/BatchDebitTypeCode'
+        company:
+          $ref: '#/components/schemas/CompanyId'
+      description: Información de la carga de archivos de débito automático.
+      x-stoplight:
+        id: 6ewaarckeke2o
+    BatchDebitId:
+      title: batchDebitId
+      maximum: 2147483647
+      minimum: 1
+      type: integer
+      description: Código de carga que agrupa los archivos del proceso de Afiliación o Cobro de débito automático.
+      example: 102030
+      x-stoplight:
+        id: y2bichvbgf59b
+    CreatePaymentTrackingRequest:
+      title: CreatePaymentTrackingRequest
+      required:
+        - applicationCode
+        - debtorAgent
+        - file
+      type: object
+      properties:
+        file:
+          $ref: '#/components/schemas/DebitFileId'
+        batchDebitId:
+          $ref: '#/components/schemas/BatchDebitId'
+        applicationCode:
+          $ref: '#/components/schemas/ApplicationCode'
+        debtorAgent:
+          $ref: '#/components/schemas/DebtorAgent'
+      x-stoplight:
+        id: zuceduhn9j5a2
+    UpdatePaymentTrackingRequest:
+      title: UpdatePaymentTrackingRequest
+      required:
+        - trackingStatusCode
+      type: object
+      properties:
+        batchDebitId:
+          $ref: '#/components/schemas/BatchDebitId'
+        trackingStatusCode:
+          $ref: '#/components/schemas/TrackingStatusCode'
+        debtorAgent:
+          $ref: '#/components/schemas/DebtorAgent'
+      x-stoplight:
+        id: 8e8c0i5mmb5yc
+    SearchPaymentsTrackingRequest:
+      title: SearchPaymentsTrackingRequest
+      required:
+        - metadata
+        - paymentTracking
+      type: object
+      properties:
+        paymentTracking:
+          $ref: '#/components/schemas/PaymentTrackingSearch'
+        metadata:
+          $ref: '#/components/schemas/MetadataRequest'
+      x-stoplight:
+        id: zxmwjuglutuc8
+    PaymentTrackingSearch:
+      title: PaymentTrackingSearch
+      required:
+        - companyId
+      type: object
+      properties:
+        paymentTrackingId:
+          $ref: '#/components/schemas/PaymentTrackingId'
+        companyId:
+          $ref: '#/components/schemas/CompanyIdParam'
+        trackingStatus:
+          $ref: '#/components/schemas/StatusCode'
+        accountId:
+          $ref: '#/components/schemas/AccountIdParam'
+        fromDate:
+          $ref: '#/components/schemas/FromDateParam'
+        toDate:
+          $ref: '#/components/schemas/ToDateParam'
+      x-stoplight:
+        id: 1o7jwbb4wn5o5
+    CompanyIdParam:
+      maxLength: 15
+      minLength: 1
+      pattern: '^[A-Z0-9]*$'
+      type: string
+      description: Código cic de la Compañia afiliado al producto de Débito Automático.
+      example: '200'
+      x-stoplight:
+        id: z3u8ftee71zzc
+    AccountIdParam:
+      maximum: 2147483647
+      minimum: 1
+      type: integer
+      description: Código de la cuenta de Debito Automático.
+      example: 100
+      x-stoplight:
+        id: 8hiw75t2z0qmg
+    FromDateParam:
+      maxLength: 10
+      minLength: 10
+      pattern: '^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$'
+      type: string
+      description: Fecha inicial para el rango de fechas a filtrar.
+      example: '2023-11-08'
+      x-stoplight:
+        id: t36mnalxu83lx
+    ToDateParam:
+      maxLength: 10
+      minLength: 10
+      pattern: '^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$'
+      type: string
+      description: Fecha final para el rango de fechas a filtrar.
+      example: '2023-11-30'
+      x-stoplight:
+        id: bevsvasx244l2
+    MetadataRequest:
+      required:
+        - limit
+        - offset
+      type: object
+      properties:
+        offset:
+          maximum: 2147483647
+          minimum: 1
+          type: integer
+          description: Indica la cantidad de registros que serán exonerados en la búsqueda. (Ej. offset = 50 es decir obtener los registros desde 51 a 75).
+          example: 50
+        limit:
+          maximum: 500
+          minimum: 1
+          type: integer
+          description: Indica la cantidad máxima de registros a traer.
+          example: 25
+      x-stoplight:
+        id: 0boflx1wr2253
+    SearchPaymentsTrackingResponse:
+      title: SearchPaymentsTrackingResponse
+      type: object
+      properties:
+        paymentsTracking:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentTracking'
+        metadata:
+          $ref: '#/components/schemas/MetadataResponse'
+      x-stoplight:
+        id: nhk3aizr1mbv6
+    GetCompanyResponse:
+      title: GetCompanyResponse
+      type: object
+      properties:
+        company:
+          $ref: '#/components/schemas/Company'
+      x-stoplight:
+        id: rpl8ove60nkf9
+    Company:
+      title: Company
+      type: object
+      properties:
+        companyId:
+          type: string
+          description: Código cic de la empresa afiliada al producto de Débito Automático.
+          example: '8200200'
+        companyCode:
+          type: integer
+          description: Código de la empresa afiliada al producto de Débito Automático.
+          example: 200
+        companyName:
+          type: string
+          description: Nombre de la empresa.
+          example: Telefonica
+        identificationDocument:
+          $ref: '#/components/schemas/IdentificationDocument'
+        registrationDate:
+          type: string
+          description: Fecha de registro del grupo de archivos.
+          format: date-time
+          example: '2017-07-21T17:32:28Z'
+        companyStatus:
+          type: string
+          description: Estado de la empresa. Ejm. (ENABLED|DISABLED).
+          example: ENABLED
+      x-stoplight:
+        id: qbqp6tajb629m
+    IdentificationDocument:
+      title: IdentificationDocument
+      type: object
+      properties:
+        documentType:
+          $ref: '#/components/schemas/DocumentType'
+        documentNumber:
+          type: string
+          description: Número de documento.
+          example: '73889235'
+      x-stoplight:
+        id: qr8yg4s7teg3g
+    DocumentType:
+      title: DocumentType
+      type: object
+      properties:
+        code:
+          type: string
+          description: Código del tipo de document.
+          example: DNI
+        description:
+          type: string
+          description: Descripción del tipo de documento.
+          example: Documento Nacional de Identidad.
+      x-stoplight:
+        id: ihui6qbm8dtmm
+    ListAccountsResponse:
+      title: ListAccountsResponse
+      type: object
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Account'
+      x-stoplight:
+        id: w9v9othj9gvst
+    Account:
+      title: Account
+      type: object
+      properties:
+        accountId:
+          type: integer
+          description: Código de la cuenta.
+          example: 200
+        accountType:
+          $ref: '#/components/schemas/AccountType'
+        accountStatus:
+          type: string
+          description: Estado de la cuenta. Ejm. (ENABLED|DISABLED)
+          example: ENABLED
+        accountNumber:
+          type: string
+          description: Número de la cuenta.
+          example: '1921429428175'
+        accountNumberFormat:
+          type: string
+          description: Formato del número de la cuenta.
+          example: '1931000013276909'
+        accountShortNumber:
+          type: string
+          description: Número corto de la cuenta.
+          example: '1429428'
+        service:
+          $ref: '#/components/schemas/CompanyService'
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+      x-stoplight:
+        id: v2t8vg0lw33cy
+    AccountType:
+      title: AccountType
+      type: object
+      properties:
+        code:
+          type: string
+          description: codigo del tipo de cuenta.
+          example: '1'
+        description:
+          type: string
+          description: Descripcion del tipo de cuenta.
+          example: CTA. CTE. MN.
+      x-stoplight:
+        id: hx23nr5cjwvb7
+    CompanyService:
+      title: CompanyService
+      required:
+        - serviceCode
+      type: object
+      properties:
+        serviceCode:
+          type: integer
+          description: Código del servicio de la Compañía.
+          example: 102
+        serviceDescription:
+          type: string
+          description: Descripción del servicio de la Compañía.
+          example: Telefono fijo.
+      x-stoplight:
+        id: 6jytbbrbav6ye
+    GetAccountResponse:
+      title: GetCompanyResponse
+      type: object
+      properties:
+        account:
+          $ref: '#/components/schemas/Account'
+      x-stoplight:
+        id: uiovv3bk7lpvi
+x-bcp-api-type: BS
+x-bcp-api-id: direct-debit-testing
