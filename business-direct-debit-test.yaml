@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: API BS Direct Debit Testing V1
+  title: API BS Direct Debit Testing V11
   description: 'Permite registrar la operación inicial de carga de archivos, registrar, remover y listar los errores de los metadatos de los archivos. Además, registrar y listar el seguimiento de las solicitudes de Afiliación o Cobro a los usuarios de las empresas afiliadas al producto de Débito Automático.'
   version: 1.0.0
 externalDocs:
